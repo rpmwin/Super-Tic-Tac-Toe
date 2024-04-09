@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
+  const [counter, setCounter] = useState(0);
   const [gridData, setGridData] = useState(
     Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => '')),
   );
@@ -74,11 +75,15 @@ function App() {
       const info = 'O is winner';
       notify(info);
     }
+
     for (let i = 0; i < winnersArray.length; i++) {
       if (winnersArray[i] !== '') {
-        const info = 'Game is tie';
-        notify(info);
+        setCounter(counter + 1);
       }
+    }
+    if (counter === 9) {
+      const info = 'Game is tie';
+      notify(info);
     }
   }, [winnersArray]);
 
