@@ -15,7 +15,8 @@ function App() {
 
   const [player, setPlayer] = useState('X');
 
-  const [playableBoxes, setPlayableBoxes] = useState(4);
+  const [playableBoxes, setPlayableBoxes] = useState([4]);
+  const [Winner , setWinner] = useState(false)
 
   const notify = (info) => toast.success(info);
 
@@ -69,10 +70,12 @@ function App() {
 
     if (XisWinner) {
       const info = 'X is winner';
+      setWinner('X');
       notify(info);
     }
     if (OisWinner) {
       const info = 'O is winner';
+      setWinner('O');
       notify(info);
     }
 
@@ -87,11 +90,40 @@ function App() {
     }
   }, [winnersArray]);
 
+  const checkPlayableBoxes = (rowIndex) => {
+    const row = gridData[rowIndex];
+    let playable = false;
+
+    for (let i = 0; i < row.length; i++) {
+      if (row[i] === '') {
+        playable = true;
+        break;
+      }
+    }
+
+    return playable;
+  };
+
   const handleCellClick = (rowIndex, colIndex) => {
-    if (gridData[rowIndex][colIndex] !== '' || rowIndex !== playableBoxes) {
+    if (
+      gridData[rowIndex][colIndex] !== '' ||
+      playableBoxes.indexOf(rowIndex) === -1
+    ) {
       return;
     }
-    setPlayableBoxes(colIndex);
+    if (checkPlayableBoxes(colIndex)) {
+      const dummyPlayableBoxes = [colIndex];
+      setPlayableBoxes(dummyPlayableBoxes);
+    } else {
+      const dummyPlayableBoxes = [];
+      for (let i = 0; i < 9; i++) {
+        if (checkPlayableBoxes(i)) {
+          dummyPlayableBoxes.push(i);
+        }
+      }
+      setPlayableBoxes(dummyPlayableBoxes);
+    }
+
     setGridRow(rowIndex);
     const updatedGridData = [...gridData];
     updatedGridData[rowIndex][colIndex] = player;
@@ -99,6 +131,8 @@ function App() {
 
     setPlayer(player === 'X' ? 'O' : 'X');
   };
+
+  
 
   return (
     <>
@@ -110,6 +144,10 @@ function App() {
         <br />
         <div className="flex flex-col sm:flex-row items-center justify-center translate-y-[-8%]">
           <div className="text-3xl  left-10 uppercase text-center  flex flex-col ">
+            {
+              Winner && 'Winner : ' + Winner 
+            }
+            <br />
             Player : {Players[player] || player}{' '}
             <div className="flex flex-col">
               <form className="flex flex-col ">
@@ -134,21 +172,27 @@ function App() {
               </form>
             </div>
           </div>
-          <div className="grid grid-cols-3 text-2xl sm:text-4xl scale-[70%] pt-0 mt-0 translate-y-[-10%]">
+          <div className="grid grid-cols-3 text-2xl sm:text-4xl scale-[70%] pt-0 mt-0 translate-y-[-10%]" >
             {gridData.map((row, rowIndex) => (
               <div
                 key={rowIndex}
-                className="grid grid-cols-3 p-3 duration-500 "
+                className={`grid grid-cols-3 p-3 duration-500 rounded-2xl m-1 ${
+                  rowIndex === 0 || rowIndex === 1 || rowIndex === 3 
+                    ? 'border-b-[8px] border-r-[8px] border-slate-500'
+                    : rowIndex === 2 || rowIndex === 5 ? 'border-b-[8px] border-slate-500' : rowIndex === 7 ? ' border-l-[8px] border-r-[8px] border-slate-500' : rowIndex === 4 ? ' border-[8px] border-slate-500' : ''
+                }`}
                 style={{
-                  pointerEvents: rowIndex === playableBoxes ? 'auto' : 'none',
+                  pointerEvents:
+                    playableBoxes.indexOf(rowIndex) !== -1 ? 'auto' : 'none',
                   backgroundColor:
-                    rowIndex === playableBoxes
-                      ? 'rgba(0, 0, 0, 0.5)'
+                    playableBoxes.indexOf(rowIndex) !== -1
+                      ? 'rgba(0, 255, 0, 0.4)'
                       : winnersArray[rowIndex] === 'X'
                       ? 'rgb(233, 116, 81 , 0.7)'
                       : winnersArray[rowIndex] === 'O'
                       ? 'rgba(30,190,255 , 0.5)'
                       : '',
+                      
                 }}
               >
                 {row.map((cell, colIndex) => (
@@ -160,7 +204,7 @@ function App() {
                         : cell === 'X'
                         ? 'bg-red-500 '
                         : 'bg-blue-500 '
-                    } hover:text-black hover:bg-slate-200 duration-500`}
+                    } hover:text-black hover:bg-slate-200 duration-500 `}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     style={{
                       pointerEvents: cell !== '' ? 'none' : 'auto',
