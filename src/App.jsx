@@ -176,7 +176,7 @@ function App() {
             {gridData.map((row, rowIndex) => (
               <div
                 key={rowIndex}
-                className={`grid grid-cols-3 p-3 duration-500 rounded-2xl m-1 ${
+                className={`grid grid-cols-3 sm:p-3 duration-500 rounded-2xl sm:m-1 ${
                   rowIndex === 0 || rowIndex === 1 || rowIndex === 3 
                     ? 'border-b-[8px] border-r-[8px] border-slate-500'
                     : rowIndex === 2 || rowIndex === 5 ? 'border-b-[8px] border-slate-500' : rowIndex === 7 ? ' border-l-[8px] border-r-[8px] border-slate-500' : rowIndex === 4 ? ' border-[8px] border-slate-500' : ''
